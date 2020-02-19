@@ -1,0 +1,117 @@
+body {
+  font-family: 'Helvetica Neue', Verdana, Helvetica, Arial, sans-serif;
+  max-width: 800px;
+  max-height: 800px;
+  margin: 0 auto;
+  padding-top: 72px;
+  -webkit-font-smoothing: antialiased;
+  font-size: 1.125em;
+  color: #333;
+  line-height: 1.5em;
+}
+
+h1, h2, h3 {
+  color: #000;
+}
+
+h1 {
+  font-size: 2.5em
+}
+
+h2 {
+  font-size: 2em
+}
+
+h3 {
+  font-size: 1.5em
+}
+
+a {
+  text-decoration: none;
+  color: #09f;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+}
+
+.score {
+  width: 50%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.board {
+  display: flex;
+  flex-direction: column;
+
+  /*border-top:  1px solid black;*/
+  /*border-bottom:  1px solid black;*/
+}
+
+.row {
+  display: flex;
+  height: 30px;
+  width: 450px;
+  /*border-right: 1px solid black;*/
+  /*border-left: 1px solid black;*/
+}
+
+.element {
+  width: 30px;
+  height: 30px;
+  border: 1px solid black;
+  box-sizing: border-box;
+}
+
+.element:hover {
+  cursor: pointer;
+  border: 1px dot-dash;
+  opacity: 0.80;
+}
+
+.palatte-div {
+  width: 40px;
+  height: 40px;
+}
+
+.palatte-div:hover {
+  cursor: pointer;
+  width: 42px;
+  height: 42px;
+  box-sizing: border-box;
+}
+
+.color-palatte {
+  width: 450px;
+  height: 40px;
+
+  display: flex;
+  flex-direction: row;
+  padding-top: 20px;
+}
+
+.selected {
+  width: 42px;
+  height: 42px;
+  box-sizing: border-box;
+  border: 2px solid black;
+}
+
+.next-level {
+  margin-top: 20px;
+  width: 80px;
+  height: 40px;
+  outline: none;
+  border-radius: 10%;
+}
+
+.next-level:hover {
+  background-color: #ddd;
+  color: black;
+}
