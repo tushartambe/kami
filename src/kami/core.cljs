@@ -6,28 +6,42 @@
 ;; -------------------------
 ;; Views
 
-(def raw-data {:board        [[0 0 0 1 1 1 1 2 0 0 0 1 1 1 2 2]
-                              [2 0 3 3 3 0 2 2 2 0 0 1 1 1 2 2]
-                              [0 0 0 0 0 2 2 2 2 2 0 1 1 1 2 2]
-                              [0 0 0 1 2 2 2 2 2 2 2 1 1 1 2 2]
-                              [2 0 3 2 2 2 2 2 2 2 2 2 1 1 2 2]
-                              [0 0 0 0 2 2 2 2 2 2 2 1 1 1 2 2]
-                              [0 0 0 1 1 2 2 2 2 2 0 1 1 1 2 2]
-                              [2 0 3 3 3 0 2 2 2 0 0 1 1 1 2 2]
-                              [0 0 0 0 0 1 4 2 0 0 0 1 1 1 2 2]]
-               :level        0
-               :best-so-far  5
-               :no-of-colors 5})
+(def raw-data [{:board        [
+                               [0 0 0 1 1 1 1 2 0 0 0 1 1 1 2 2]
+                               [0 0 0 1 1 1 1 2 0 0 0 1 1 1 2 2]
+                               [0 0 0 1 1 1 1 2 0 0 0 1 1 1 2 2]
+                               [0 0 0 1 1 1 1 2 0 0 0 1 1 1 2 2]
+                               [0 0 0 1 1 1 1 2 0 0 0 1 1 1 2 2]
+                               [0 0 0 1 1 1 1 2 0 0 0 1 1 1 2 2]
+                               [0 0 0 1 1 1 1 2 0 0 0 1 1 1 2 2]
+                               [0 0 0 1 1 1 1 2 0 0 0 1 1 1 2 2]
+                               [0 0 0 0 0 1 2 2 0 0 0 1 1 1 2 2]
+                               ]
+                :level        0
+                :best-so-far  5
+                :no-of-colors 10}
+               {:board        [
+                               [0 0 0 1 1 1 1 2 0 0 0 1 1 1 2 2]
+                               [0 0 0 1 1 1 1 2 0 0 0 1 1 1 2 2]
+                               [0 0 0 1 1 1 1 2 0 0 0 1 1 1 2 2]
+                               [0 0 0 1 1 1 1 2 0 0 0 1 1 1 3 3]
+                               ]
+                :level        1
+                :best-so-far  10
+                :no-of-colors 4}
+               {}])
 
-(defonce board (r/atom (:board raw-data)))
-(defonce selected-color (r/atom 1))
+(defonce level (r/atom 0))
+(defonce board (r/atom (:board (raw-data @level))))
+(defonce selected-color (r/atom 0))
 (defonce total-moves (r/atom 0))
 (defonce won? (r/atom false))
 
-(def sample-colors [[0 "darkred"] [1 "midnightblue"] [2 "green"] [3 "purple"] [4 "deeppink"] [5 "lightblue"] [6 "maroon"] [7 "orange"] [8 "silver"]])
-(def colors (into {} (take (:no-of-colors raw-data) sample-colors)))
 
-(defn change-board [position old-color]
+(def sample-colors [[0 "#ff6b6b"] [1 "#5f27cd"] [2 "#48dbfb"] [3 "gray"] [4 "#1dd1a1"] [5 "#576574"] [6 "#ff9ff3"] [7 "#00d2d3"] [8 "#feca57"] [9 "#54a0ff"]])
+(defn colors [number-of-colors] (into {} (take number-of-colors sample-colors)))
+
+(defn apply-move [position old-color]
   (when-not (= old-color @selected-color)
     (swap! board l/change-all position old-color @selected-color)
     (swap! total-moves inc)
@@ -40,8 +54,8 @@
   (let [cell (get-in @board [row-index index])]
     [:div {:class   "element"
            :id      (str row-index " " index)
-           :onClick (partial change-board [row-index index] cell)
-           :style   {:background-color (colors cell)}
+           :onClick (partial apply-move [row-index index] cell)
+           :style   {:background-color ((colors (:no-of-colors (raw-data @level))) cell)}
            :key     (str "element" row-index "-" index)
            }])
   )
@@ -63,18 +77,36 @@
          :key     color
          }])
 
+(defn change-level [f]
+  (swap! level f)
+  (reset! board (:board (raw-data @level)))
+  (reset! won? false)
+  (reset! total-moves 0)
+  (reset! selected-color 0)
+  )
+
 (defn home-page []
   [:div {:class "page"}
    [:div {:class "header"}
     [:h2 "KAMI"]
+    [:h4 "Level - " @level]
+    (when @won? [:h4 {:class "winning-message"} "YOU WON!!!"])
     [:div
      {:class "score"}
      [:span "Total Moves : " @total-moves]
-     [:span "Best So Far : " (:best-so-far raw-data)]]
+     [:span "Best So Far : " (:best-so-far (raw-data @level))]]
     ]
-   [:div {:class "board"} (map-indexed render-row @board)]
-   [:div {:class "color-palatte"} (map (partial create-color-palatte @selected-color) colors)]
-   (when @won? [:button {:class "next-level"} ">"])
+   [:div {:class "board"} (map-indexed render-row @board)
+    ]
+   [:div {:class "color-palatte"} (map (partial create-color-palatte @selected-color) (colors (:no-of-colors (raw-data @level))))]
+   [:div {:class "change-level"}
+    (when (> @level 0)
+      [:button {:class   "level"
+                :onClick (partial change-level dec)} "<"])
+    (when (and @won? (> (dec (count raw-data)) @level))
+      [:button {:class   "level"
+                :onClick (partial change-level inc)} ">"])
+    ]
    ]
   )
 
