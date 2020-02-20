@@ -54,9 +54,7 @@
    (map-indexed (partial create-divs index) row)])
 
 (defn select-color-from-palatte [color]
-  (println "selected color")
-  (reset! selected-color (first color))
-  (println "selected color" @selected-color))
+  (reset! selected-color (first color)))
 
 (defn create-color-palatte [current-color color]
   [:div {:class   ["palatte-div" (if (= current-color (first color)) "selected" "")]

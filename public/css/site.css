@@ -3,7 +3,7 @@ body {
   max-width: 800px;
   max-height: 800px;
   margin: 0 auto;
-  padding-top: 72px;
+  padding-top: 0px;
   -webkit-font-smoothing: antialiased;
   font-size: 1.125em;
   color: #333;
@@ -56,15 +56,15 @@ a:hover {
 
 .row {
   display: flex;
-  height: 30px;
-  width: 450px;
+  height: 20px;
+  width: 300px;
   /*border-right: 1px solid black;*/
   /*border-left: 1px solid black;*/
 }
 
 .element {
-  width: 30px;
-  height: 30px;
+  width: 20px;
+  height: 20px;
   border: 1px solid black;
   box-sizing: border-box;
 }
@@ -72,7 +72,7 @@ a:hover {
 .element:hover {
   cursor: pointer;
   border: 1px dot-dash;
-  opacity: 0.80;
+  opacity: 0.90;
 }
 
 .palatte-div {

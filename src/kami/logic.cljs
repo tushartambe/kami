@@ -14,10 +14,25 @@
 (defn game-won? [board]
   (= 1 (count (into #{} (flatten board)))))
 
+;(defn change-all [board position old-color new-color]
+;  (loop [positions #{position}
+;         board board]
+;    (if (empty? positions)
+;      board
+;      (let [new-positions (mapcat (partial neighbors-of-same-color board old-color) positions)]
+;        (recur new-positions (change board positions new-color))))))
+;-------------------------
+
+(defn expand [board color positions]
+  (into positions (mapcat (partial neighbors-of-same-color board color) positions)))
+
+(defn get-all-positions [board pos old-color]
+  (loop [board board
+         pos #{pos}]
+    (if (= pos (expand board old-color pos))
+      pos
+      (recur board (expand board old-color pos)))))
+
 (defn change-all [board position old-color new-color]
-  (loop [positions #{position}
-         board board]
-    (if (empty? positions)
-      board
-      (let [new-positions (mapcat (partial neighbors-of-same-color board old-color) positions)]
-        (recur new-positions (change board positions new-color))))))
+  (change board (get-all-positions board position old-color) new-color)
+  )
