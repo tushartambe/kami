@@ -33,6 +33,13 @@
       pos
       (recur board (expand board old-color pos)))))
 
+;(defn changer [positions selected-color]
+;  (loop [pos (into [] positions)]
+;    (when-not (empty? pos)
+;      (do
+;        (js/setTimeout #(reset! board (l/change @board #{(first pos)} selected-color)) 100)
+;        (recur (rest pos))))))
+
 (defn change-all [board position old-color new-color]
   (change board (get-all-positions board position old-color) new-color)
   )

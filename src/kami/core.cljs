@@ -7,19 +7,20 @@
 ;; Views
 
 (def raw-data [{:board        [
-                               [0 0 0 1 1 1 1 2 0 0 0 1 1 1 2 2]
-                               [0 0 0 1 1 1 1 2 0 0 0 1 1 1 2 2]
-                               [0 0 0 1 1 1 1 2 0 0 0 1 1 1 2 2]
-                               [0 0 0 1 1 1 1 2 0 0 0 1 1 1 2 2]
-                               [0 0 0 1 1 1 1 2 0 0 0 1 1 1 2 2]
-                               [0 0 0 1 1 1 1 2 0 0 0 1 1 1 2 2]
-                               [0 0 0 1 1 1 1 2 0 0 0 1 1 1 2 2]
-                               [0 0 0 1 1 1 1 2 0 0 0 1 1 1 2 2]
-                               [0 0 0 0 0 1 2 2 0 0 0 1 1 1 2 2]
+                               [0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1]
+                               [0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1]
+                               [0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1]
+                               [0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1]
+                               [0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1]
+                               [0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1]
+                               [0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1]
+                               [0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1]
+                               [0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1]
+                               [0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1]
                                ]
                 :level        0
-                :best-so-far  5
-                :no-of-colors 10}
+                :best-so-far  2
+                :no-of-colors 2}
                {:board        [
                                [0 0 0 1 1 1 1 2 0 0 0 1 1 1 2 2]
                                [0 0 0 1 1 1 1 2 0 0 0 1 1 1 2 2]
@@ -28,8 +29,7 @@
                                ]
                 :level        1
                 :best-so-far  10
-                :no-of-colors 4}
-               {}])
+                :no-of-colors 4} {}])
 
 (defonce level (r/atom 0))
 (defonce board (r/atom (:board (raw-data @level))))
@@ -42,13 +42,14 @@
 (defn colors [number-of-colors] (into {} (take number-of-colors sample-colors)))
 
 (defn apply-move [position old-color]
-  (when-not (= old-color @selected-color)
-    (swap! board l/change-all position old-color @selected-color)
-    (swap! total-moves inc)
-    (when (l/game-won? @board)
-      (reset! won? true)
-      )
-    ))
+  (when (< @total-moves (:best-so-far (raw-data @level)))
+    (when-not (and (= old-color @selected-color))
+      (swap! board l/change-all position old-color @selected-color)
+      (swap! total-moves inc)
+      (when (l/game-won? @board)
+        (reset! won? true)
+        )
+      )))
 
 (defn create-divs [row-index index element]
   (let [cell (get-in @board [row-index index])]
@@ -85,30 +86,48 @@
   (reset! selected-color 0)
   )
 
+(defn reset-current-level []
+  (reset! board (:board (raw-data @level)))
+  (reset! won? false)
+  (reset! total-moves 0)
+  (reset! selected-color 0)
+  )
+
 (defn home-page []
   [:div {:class "page"}
    [:div {:class "header"}
     [:h2 "KAMI"]
-    [:h4 "Level - " @level]
-    (when @won? [:h4 {:class "winning-message"} "YOU WON!!!"])
-    [:div
-     {:class "score"}
-     [:span "Total Moves : " @total-moves]
-     [:span "Best So Far : " (:best-so-far (raw-data @level))]]
-    ]
-   [:div {:class "board"} (map-indexed render-row @board)
-    ]
-   [:div {:class "color-palatte"} (map (partial create-color-palatte @selected-color) (colors (:no-of-colors (raw-data @level))))]
-   [:div {:class "change-level"}
-    (when (> @level 0)
-      [:button {:class   "level"
+    (when @won? [:h4 {:class "winning-message"} "Level completed!"])]
+
+   [:div {:class "play-ground"}
+    [:div {:class "board-container"}
+     [:div {:class "board"} (map-indexed render-row @board)]
+
+     [:div {:class "color-palatte"}
+      (map (partial create-color-palatte @selected-color)
+           (colors (:no-of-colors (raw-data @level))))]]
+
+    [:div {:class "sidebar"}
+     [:div {:class "levels"}
+      [:div {:class ["current-level"]} @level]
+      [:div {:class "change-level"}
+
+       (when (> @level 0)
+         [:div {:class   ["level" "level-btn"]
                 :onClick (partial change-level dec)} "<"])
-    (when (and @won? (> (dec (count raw-data)) @level))
-      [:button {:class   "level"
-                :onClick (partial change-level inc)} ">"])
-    ]
-   ]
-  )
+
+       (when (and @won? (> (dec (count raw-data)) @level))
+         [:div {:class   ["level" "level-btn"]
+                :onClick (partial change-level inc)} ">"])]]
+
+     [:div {:class "moves"}
+      [:div {:class "player-moves"} @total-moves]
+      [:div {:class "total-moves"}
+       [:div {:class "level"} (:best-so-far (raw-data @level))]]]
+
+     [:div {:class "reset"}
+      [:div {:class   "reset-btn"
+             :onClick reset-current-level}]]]]])
 
 ;; -------------------------
 ;; Initialize app
