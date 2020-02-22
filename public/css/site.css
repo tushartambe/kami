@@ -107,12 +107,16 @@ a:hover {
   display: flex;
   flex-direction: row;
   justify-content: space-evenly;
-  padding: 0 0 1% 0.5%;
+  padding: 0.4% 0 1% 0.5%;
   box-sizing: border-box;
 }
 
 .palatte-div{
   width: 100%;
+}
+.palatte-div:hover{
+  cursor: pointer;
+  filter: brightness(96%);
 }
 .sidebar{
   width: 20%;
@@ -158,6 +162,15 @@ a:hover {
 
 .selected {
   border: 2px solid black;
+  background:
+          linear-gradient(225deg, transparent 50%, #C9CCD4 50%),
+          linear-gradient(45deg, #FFF, #FFF),
+          linear-gradient(135deg, #FFF, #FFF),
+          linear-gradient(225deg, #FFF 25px, transparent 10px);
+
+  background-size: 35px 35px, 0 0, 0 0, 100% 100%;
+  background-position: 100% 0, 0 0, 100% 100%, 100% 0;
+  background-repeat: no-repeat;
 }
 
 .current-level{
